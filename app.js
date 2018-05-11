@@ -49,7 +49,7 @@ app.get('/subscriptions', (req, res, next) => {
    var subscriptions1 = require('./JsFiles/getchannelbysubscription');
     //console.log("subscriptions1", subscriptions1());
     subscriptions1().then((data) => {
-        console.log("data-api  ", data);
+      //  console.log("data-api  ", data);
         return res.json(data); 
     })
     // fetch('./JsFiles/getchannelbysubscription.js')

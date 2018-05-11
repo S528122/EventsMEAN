@@ -27,7 +27,7 @@ async function getdata(){
     console.log('getdata');
     try{
       let content = fs.readFileSync('./JsFiles/client_secret.json');
-      console.log("content", JSON.parse(content));
+      //console.log("content", JSON.parse(content));
     return await  authorize(JSON.parse(content), {'params': {'mine': 'true',
       'part': 'snippet'}}, subscriptionsListMySubscriptions);
 
@@ -66,7 +66,7 @@ async function authorize(credentials, requestData, callback) {
     let token =  fs.readFileSync(TOKEN_PATH);
     oauth2Client.credentials = JSON.parse(token);
     let data1 = await callback(oauth2Client, requestData);
-    console.log("data", data1);
+    //console.log("data", data1);
     return data1;
   }catch(err){
     getNewToken(oauth2Client, requestData, callback);
@@ -205,7 +205,7 @@ function subscriptionsListMySubscriptions(auth, requestData) {
     console.log("into api");
     //var mydata = new channel(req.bo)
   //storeData(response.data);
-console.log(response.data);
+//console.log(response.data);
     resolve( response.data );
     }
   });
