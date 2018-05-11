@@ -6,7 +6,13 @@ var {google} = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
 var sub;
 var CircularJSON = require('circular-json');
-
+// var mongo = require('mongodb');
+// var MongoClient = require('mongodb').MongoClient;
+// var express = require('express');
+// var mongoose = require('mongoose');
+// var url = "mongodb://127.0.0.1:27017";
+// var schemaChannel = require('./Model/getchannel');
+// var channel = mongoose.model("channel",schemaChannel);
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/google-apis-nodejs-quickstart.json
 var SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
@@ -17,19 +23,29 @@ var TOKEN_PATH = TOKEN_DIR + 'google-apis-nodejs-quickstart.json';
 console.log('after tokenpath');
 
 // Load client secrets from a local file.
-function getdata(){
+async function getdata(){
     console.log('getdata');
-fs.readFile('./JsFiles/client_secret.json', function processClientSecrets(err, content) {
-  if (err) {
-    console.log('Error loading client secret file: ' + err);
-    return;
-  }
-  // Authorize a client with the loaded credentials, then call the YouTube API.
-  
- authorize(JSON.parse(content), {'params': {'mine': 'true',
-                 'part': 'snippet'}}, subscriptionsListMySubscriptions);
+    try{
+      let content = fs.readFileSync('./JsFiles/client_secret.json');
+      console.log("content", JSON.parse(content));
+    return await  authorize(JSON.parse(content), {'params': {'mine': 'true',
+      'part': 'snippet'}}, subscriptionsListMySubscriptions);
 
-});
+    }catch(e){
+      console.log('Error loading client secret file: ' + err);
+      return;  
+   }
+// fs.readFile('./JsFiles/client_secret.json', function(err, content) {
+//   if (err) {
+//     console.log('Error loading client secret file: ' + err);
+//     return;
+//   }
+//   //Authorize a client with the loaded credentials, then call the YouTube API.
+//   console.log("content", JSON.parse(content));
+//  return authorize(JSON.parse(content), {'params': {'mine': 'true',
+//                  'part': 'snippet'}}, subscriptionsListMySubscriptions);
+
+// });
 }
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -38,7 +54,7 @@ fs.readFile('./JsFiles/client_secret.json', function processClientSecrets(err, c
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, requestData, callback) {
+async function authorize(credentials, requestData, callback) {
   var clientSecret = credentials.installed.client_secret;
   var clientId = credentials.installed.client_id;
   var redirectUrl = credentials.installed.redirect_uris[0];
@@ -46,15 +62,24 @@ function authorize(credentials, requestData, callback) {
  // var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
   var oauth2Client = new OAuth2Client(clientId, clientSecret, redirectUrl);
 
+  try {
+    let token =  fs.readFileSync(TOKEN_PATH);
+    oauth2Client.credentials = JSON.parse(token);
+    let data1 = await callback(oauth2Client, requestData);
+    console.log("data", data1);
+    return data1;
+  }catch(err){
+    getNewToken(oauth2Client, requestData, callback);
+  }
   // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, function(err, token) {
-    if (err) {
-      getNewToken(oauth2Client, requestData, callback);
-    } else {
-      oauth2Client.credentials = JSON.parse(token);
-      callback(oauth2Client, requestData);
-    }
-  });
+  // fs.readFile(TOKEN_PATH, function(err, token) {
+  //   if (err) {
+  //     getNewToken(oauth2Client, requestData, callback);
+  //   } else {
+  //     oauth2Client.credentials = JSON.parse(token);
+  //     callback(oauth2Client, requestData);
+  //   }
+  // });
 }
 
 /**
@@ -66,6 +91,7 @@ function authorize(credentials, requestData, callback) {
  *     client.
  */
 function getNewToken(oauth2Client, requestData, callback) {
+  console.log("getNewTOken");
   var authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES
@@ -167,17 +193,29 @@ function subscriptionsListMySubscriptions(auth, requestData) {
   var service = google.youtube('v3');
   var parameters = removeEmptyParameters(requestData['params']);
   parameters['auth'] = auth;
+  let promise = new Promise(function(resolve, reject){
+
+  
   service.subscriptions.list(parameters, function(err, response) {
     if (err) {
       console.log('The API returned an error: ' + err);
-      return;
+      reject(err);
     }
+    else{
     console.log("into api");
- console.log(response.data);
-    return response.data;
+    //var mydata = new channel(req.bo)
+  //storeData(response.data);
+console.log(response.data);
+    resolve( response.data );
+    }
   });
+});
+return promise;
 }
+// function storeData(response){
+
+// }
 
 
-module.exports = { getdata };
+module.exports =  getdata ;
 

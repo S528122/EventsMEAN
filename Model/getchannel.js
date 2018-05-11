@@ -1,11 +1,15 @@
 var mongoose = require('mongoose');
 
 const channelschema = mongoose.Schema({
-    channelid:{
+    title:{
         type: String,
         required: true
     },
-    channelname:{
+    description:{
+        type: String,
+        required: true
+    },
+    channelid:{
         type: String,
         required: true
     },

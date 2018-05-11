@@ -12,6 +12,7 @@
     "googleapis": "^29.0.0",
     "mongodb": "^3.0.7",
     "mongoose": "^5.0.17",
+    "node-fetch": "^2.1.2",
     "nodemon": "^1.17.3",
     "request": "^2.85.0"
   },
