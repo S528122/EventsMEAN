@@ -6,19 +6,11 @@ var {google} = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
 var sub;
 var CircularJSON = require('circular-json');
-// var mongo = require('mongodb');
-// var MongoClient = require('mongodb').MongoClient;
-// var express = require('express');
-// var mongoose = require('mongoose');
-// var url = "mongodb://127.0.0.1:27017";
-// var schemaChannel = require('./Model/getchannel');
-// var channel = mongoose.model("channel",schemaChannel);
-// If modifying these scopes, delete your previously saved credentials
-// at ~/.credentials/google-apis-nodejs-quickstart.json
 var SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
 var TOKEN_PATH = TOKEN_DIR + 'google-apis-nodejs-quickstart.json';
+var dbChannel = require('./mongoconnection');
 
 console.log('after tokenpath');
 
@@ -29,7 +21,7 @@ async function getdata(){
       let content = fs.readFileSync('./JsFiles/client_secret.json');
       //console.log("content", JSON.parse(content));
     return await  authorize(JSON.parse(content), {'params': {'mine': 'true',
-      'part': 'snippet'}}, subscriptionsListMySubscriptions);
+      'part': 'snippet','maxResults': '25'}}, subscriptionsListMySubscriptions);
 
     }catch(e){
       console.log('Error loading client secret file: ' + err);
@@ -206,6 +198,7 @@ function subscriptionsListMySubscriptions(auth, requestData) {
     //var mydata = new channel(req.bo)
   //storeData(response.data);
 //console.log(response.data);
+      
     resolve( response.data );
     }
   });
